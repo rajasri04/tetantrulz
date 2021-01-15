@@ -1,0 +1,24 @@
+﻿@model tetantrulz.NewCustmerViewModel.NewCustomerViewModel
+@{
+    ViewBag.Title = "New";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>New Customer</h2>
+
+@using (@Html.BeginForm("Save", "Customer"))
+{
+    <div class="form-group">
+        @Html.LabelFor(m => m.Customer.name)
+        @Html.TextBoxFor(m => m.Customer.name, new { @class = "form-control" })
+    </div>
+    <div class="checkbox">
+        @Html.CheckBoxFor(m => m.Customer.issubcribed)check it for subscribed account..
+    </div>
+    <div class="dropdown">
+        @Html.LabelFor(m => m.Customer.demoId)
+        @Html.DropDownListFor(m => m.Customer.demoId, new SelectList(Model.demo, "Id", "name"), "select membership", new { @class = "form-control" })
+    </div>
+    @Html.HiddenFor(m => m.Customer.Id)
+    <button type="submit" class="btn btn-primary">Save</button>
+}

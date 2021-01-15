@@ -1,0 +1,20 @@
+﻿@model tetantrulz.viewmodel.RandomMovieViewModel
+@{
+    ViewBag.Title = "Random";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@Model.movie.name</h2>
+@if (Model.Customer.Count == 0)
+{ 
+    <text> no customer for this movie</text> 
+}
+else
+{
+<ul>
+    @foreach(var customer in Model.Customer)
+    {
+        <li>@customer.name</li>
+    }
+</ul>
+}

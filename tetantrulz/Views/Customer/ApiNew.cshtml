@@ -1,0 +1,64 @@
+﻿@model tetantrulz.NewCustmerViewModel.NewCustomerViewModel
+@{
+    ViewBag.Title = "ApiNew";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>New Customer creation through api</h2>
+<div class="container">
+    @using (@Html.BeginForm("ApiPost", "Customer", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        <div class="form-group">
+            @Html.LabelFor(m => m.Customer.name, new { @class = "control-label col-sm-2" })
+            @Html.TextBoxFor(m => m.Customer.name, new { @class = "form-control col-sm-10", @id = "name" })
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <div class="col-sm-offset-2 col-sm-10">
+                    @Html.CheckBoxFor(m => m.Customer.issubcribed, new { @id = "subscribeit" })
+                    check it for subscribed account..
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="dropdown">
+                @Html.LabelFor(m => m.Customer.demoId, new { @class = "control-label col-sm-2" })
+                @Html.DropDownListFor(m => m.Customer.demoId, new SelectList(Model.demo, "Id", "name"), "select membership", new { @class = "form-control col-sm-10", @id = "demoId" })
+            </div>
+        </div>
+        @Html.HiddenFor(m => m.Customer.Id)
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" id="saveapi" class="btn btn-primary api-save">Save</button>
+            </div>
+        </div>
+    }
+</div>
+        @section scripts{
+            <script>
+                $(document).ready(function () {
+                    console.log('success');
+                    $("#saveapi").click(function () {
+                        console.log('successid');
+                        var button = $(this);
+                        var Customer = new Object();
+                        Customer.name = $('#name').val();
+                        Customer.issubcribed = $('#subscribeit').val();
+                        Customer.demoId = $('#demoId').val();
+                        $.ajax({
+                            url: "/api/customer",
+                            method: "POST",
+                            dataType: "json",
+                            data: Customer,
+                            success: function (data, Status, xhr) {
+                                alert("New Customer is added ");
+                            },
+                            error: function (xhr, status, error) {
+                                alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+                            }
+
+                        });
+                    })
+                });
+            </script>
+        }

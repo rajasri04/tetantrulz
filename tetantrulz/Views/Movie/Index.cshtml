@@ -1,0 +1,163 @@
+﻿@model tetantrulz.Models.movie
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>MOVIES</h2>
+<div class="container">
+    <h2>Movie Record</h2>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" onclick="HideKey()">Add New User</button><br /><br />
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody class="tbody"></tbody>
+    </table>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title" id="myModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+               <form>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.name, new { @class = "control-label col-sm-2" })
+                        @Html.TextBoxFor(m => m.name, new { @class = "form-control col-sm-10", @id = "name" })
+                    </div>
+                    @Html.HiddenFor(m => m.Id, new {  @id = "id" })
+               </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnAdd" onclick="return Add();">Add</button>
+                <button type="button" class="btn btn-primary" id="btnUpdate" style="display:none;" onclick="Update();">Update</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            loadData();
+        })
+        function loadData() {
+            $.ajax({
+                url: '/api/Movie',
+                type: "GET",
+                dataType: "json",
+                success: function (result) {
+                    var html = '';
+                    $.each(result, function (key, item) {
+                        html += '<tr>';
+                        html += '<td>' + item.id + '</td>';
+                        html += '<td>' + item.name + '</td>';
+                        html += '<td><a href="#" onclick="return Edit(' + item.id + ')">Edit</a> | <a href="#" onclick="Delete(' + item.id + ')">Delete</a></td>';
+                        html += '</tr>';
+                    });
+                    $('.tbody').html(html);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        function Add() {
+            var Movie = new Object();
+            Movie.name = $('#name').val();
+            $.ajax({
+                url: '/api/Movie',
+                type: "POST",
+                dataType: "json",
+                data: Movie,
+                success: function (result) {
+                    loadData();
+                    $('#myModal').modal('hide');
+                    $('#name').val("");
+                    alert('new movie is added');
+                },
+                error: function (xhr, status, error) {
+                    alert(status.responseText);
+                }
+            });
+        }
+        function Update() {
+            var Movie = new Object();
+            Movie.name = $('#name').val();
+            Movie.Id = $('#id').val();
+            $.ajax({
+                url: '/api/Movie/'+Movie.Id,
+                type: "PUT",
+                data: JSON.stringify(Movie),
+                contentType: "application/json",
+                success: function (data, textStatus, xhr) {
+                    loadData();
+                    $('#myModal').modal('hide');
+                    $('#name').val("");
+                    $('#id').val("");
+                    alert('movie gets updated');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log('Error in Operation');
+                }  
+            });
+        }
+
+        function Edit(Id) {
+            $("#myModalLabel").text("Edit Person");
+            $("#id").parent().show();
+            $('#name').css('border-color', 'lightgrey');
+            $.ajax({
+                url: 'https://localhost:44313/api/Movie/' + Id,
+                type: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result) {
+                        $('#id').val(result.id);
+                        $('#name').val(result.name);
+                        $('#myModal').modal('show');
+                        $('#btnUpdate').show();
+                        $('#btnAdd').hide();
+                    }
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+            return false;
+        }
+
+        function Delete(Id) {
+            if (confirm("Are you sure you want to delete this Record?")) {
+                $.ajax({
+                    url: '/api/Movie/' + Id,
+                    type: "DELETE",
+
+                    success: function() {
+                        console.log("deleted");
+                        alert("delete successfully!");
+                        loadData();
+                    }
+                });
+            }
+        }
+        function HideKey() {
+            $("#myModalLabel").text("Add Person");
+            $("#id").parent().show();
+        }
+
+</script>
+}
